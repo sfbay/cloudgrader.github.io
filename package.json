@@ -1,0 +1,32 @@
+{
+  "name": "psd-grading-tool",
+  "version": "1.0.0",
+  "description": "Automated grading tool for Adobe Photoshop assignments",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "build": "echo 'No build process needed for this project'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "photoshop",
+    "grading",
+    "education",
+    "psd"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "ag-psd": "^14.3.6",
+    "canvas": "^3.1.2",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "jszip": "^3.10.1",
+    "multer": "^2.0.2",
+    "psd": "^3.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
