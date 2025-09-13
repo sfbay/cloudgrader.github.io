@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSD Grading Tool</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="grading-nav">
+        <div class="grading-nav-container">
+            <a href="/" class="grading-nav-brand">
+                🎨 <span>PSD Grading Tool</span>
+            </a>
+            <div class="grading-nav-links">
+                <a href="/" class="grading-nav-link grading-nav-home">
+                    🏠 Home
+                </a>
+                <div class="grading-nav-status" id="serverStatus">
+                    <span class="status-indicator" id="statusDot">●</span>
+                    <span id="statusText">Checking...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>PSD Grading Tool</h1>
+            <p>Automated assessment tool for Adobe Photoshop assignments</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Step 1: File Upload -->
+           <div class="step">
+    <h2><span class="step-number">1</span>Upload Student Work</h2>
+    
+    <!-- Canvas Download Instructions - Now Green -->
+    <div class="instructions-box">
+        <h4>📚 Canvas Download Instructions</h4>
+        <ol>
+            <li>In Canvas, go to your assignment's <strong>SpeedGrader</strong></li>
+            <li>Click the settings icon (⚙️) → <strong>Download Submissions</strong></li>
+            <li>Canvas will download a ZIP file with all submissions</li>
+            <li>Upload that ZIP file directly here - <strong>no renaming needed!</strong></li>
+        </ol>
+        <p class="instructions-note">
+            ✨ The tool automatically extracts Canvas user IDs, student names, and detects late submissions from the Canvas filename format.
+        </p>
+    </div>
+    
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📁</div>
+        <h3>Drop Canvas ZIP file here</h3>
+        <p>or individual PSD files / ZIP archives</p>
+        <input type="file" id="fileInput" class="file-input" multiple accept=".psd,.zip">
+    </div>
+    <div id="fileList" class="file-list" style="display: none;"></div>
+</div>
+
+            <!-- Step 2: Grading Criteria -->
+            <div class="step">
+                <h2><span class="step-number">2</span>Set Grading Criteria</h2>
+                
+                <!-- Filename Requirements -->
+                <div class="criteria-section" id="filenameSection">
+                    <h4 class="collapsible-header">
+                        <input type="checkbox" id="enableFilenameSection" checked>
+                        📝 Filename Requirements
+                    </h4>
+                    <div class="collapsible-content">
+                        <div class="criteria-grid">
+                            <div class="criteria-item" style="grid-column: 1 / -1;">
+                                <label>Filename Pattern</label>
+                                <select id="filenamePatternType">
+                                    <option value="custom">Custom Pattern</option>
+                                    <option value="class_name_assignment" selected>Class_LastName_Assignment (e.g., DES222_Smith_A01)</option>
+                                    <option value="name_class_assignment">LastName_Class_Assignment (e.g., Smith_DES222_A01)</option>
+                                    <option value="assignment_name_class">Assignment_LastName_Class (e.g., A01_Smith_DES222)</option>
+                                    <option value="exact">Exact Match</option>
+                                    <option value="contains">Must Contain Text</option>
+                                    <option value="regex">Regular Expression</option>
+                                </select>
+                            </div>
+                            <div class="criteria-item" style="grid-column: 1 / -1;">
+                                <label>Pattern/Text (based on selection above)</label>
+                                <input type="text" id="filenamePattern" placeholder="e.g., DES222_LastName_A01" value="{CLASS}_{LASTNAME}_{ASSIGNMENT}">
+                                <p style="margin-top: 5px; font-size: 0.8rem; color: #6b7280; line-height: 1.4;" id="patternHelp">
+                                    Pattern: {CLASS}_{LASTNAME}_{ASSIGNMENT}
+                                </p>
+                            </div>
+                            <div class="criteria-item">
+                                <label>Points for Correct Filename</label>
+                                <input type="number" id="filenamePoints" value="10" min="0" max="50">
+                                <div class="slider-container">
+                                    <input type="range" class="value-slider" id="filenamePointsSlider" value="10" min="0" max="50">
+                                    <span class="slider-label-pill" id="filenamePointsLabel" data-value="10">10</span>
+                                </div>
+                            </div>
+                            <div class="criteria-item">
+                                <label>Case Sensitive</label>
+                                <select id="filenameCaseSensitive">
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Requirements - REORDERED -->
+                <div class="criteria-section" id="technicalSection" style="margin-top: 20px;">
+                    <h4 class="collapsible-header">
+                        <input type="checkbox" id="enableTechnicalSection" checked>
+                        🎯 Technical Requirements
+                    </h4>
+                    <div class="collapsible-content">
+                        <div class="criteria-grid">
+                            <div class="criteria-item">
+                                <label>Required Width (px)</label>
+                                <input type="number" id="reqWidth" placeholder="e.g., 1920" min="0" max="7680" value="1920">
+                                <div class="slider-container">
+                                    <input type="range" class="value-slider has-notches" id="reqWidthSlider" min="0" max="7680" value="1920">
+                                    <span class="slider-label-pill" id="reqWidthLabel" data-value="1920">1920</span>
+                                </div>
+                            </div>
+                            <div class="criteria-item">
+                                <label>Required Height (px)</label>
+                                <input type="number" id="reqHeight" placeholder="e.g., 1080" min="0" max="4320" value="1080">
+                                <div class="slider-container">
+                                    <input type="range" class="value-slider has-notches" id="reqHeightSlider" min="0" max="4320" value="1080">
+                                    <span class="slider-label-pill" id="reqHeightLabel" data-value="1080">1080</span>
+                                </div>
+                            </div>
+                            <div class="criteria-item">
+                                <label>Color Mode</label>
+                                <div class="color-mode-radios">
+                                    <label class="radio-option">
+                                        <input type="radio" name="colorMode" value="" checked>
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-label">Any</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="colorMode" value="RGB">
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-label">RGB</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="colorMode" value="CMYK">
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-label">CMYK</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="colorMode" value="Grayscale">
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-label">Gray</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="criteria-item">
+                                <label>Minimum Resolution (DPI)</label>
+                                <input type="number" id="reqResolution" placeholder="e.g., 300" min="72" max="600" value="300">
+                                <div class="slider-container">
+                                    <input type="range" class="value-slider has-notches" id="reqResolutionSlider" min="72" max="600" step="1" value="300">
+                                    <span class="slider-label-pill" id="reqResolutionLabel" data-value="300">300</span>
+                                </div>
+                                <p>Common: 72 (web), 150 (draft), 300 (print)</p>
+                            </div>
+                            <div class="criteria-item">
+                                <label>Points per Criterion</label>
+                                <input type="number" id="pointsPerCriterion" value="20" min="1" max="50">
+                                <div class="slider-container">
+                                    <input type="range" class="value-slider" id="pointsPerCriterionSlider" value="20" min="1" max="50">
+                                    <span class="slider-label-pill" id="pointsPerCriterionLabel" data-value="20">20</span>
+                                </div>
+                            </div>
+                            <div class="criteria-item">
+                                <label>Minimum Layers</label>
+                                <input type="number" id="minLayers" placeholder="e.g., 3" min="1" max="5" value="1">
+                                <div class="slider-container">
+                                    <input type="range" class="value-slider" id="minLayersSlider" min="1" max="5" step="1" value="5">
+                                    <span class="slider-label-pill" id="minLayersLabel" data-value="1">1</span>
+                                </div>
+                            </div>
+                            <div class="criteria-item" style="grid-column: 1 / -1;">
+                                <label>Required Layer Names (comma-separated)</label>
+                                <input type="text" id="reqLayers" placeholder="e.g., Background, Text, Logo">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+<div class="criteria-section" id="fontsSection" style="margin-top: 20px;">
+    <h4 class="collapsible-header">
+        <input type="checkbox" id="enableFontsSection">
+        🔤 Font Requirements
+    </h4>
+    <div class="collapsible-content">
+        <div class="criteria-grid">
+            <div class="criteria-item" style="grid-column: 1 / -1;">
+                <label>Approved Fonts (comma-separated)</label>
+                <textarea id="approvedFonts" rows="5" style="width: 100%; resize: vertical; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9rem; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; background: white;">Franklin Gothic, Adobe Jenson, Sabon, Mr. Eaves, Mrs. Eaves, FF. Ernestine, Adobe Garamond, Scala, FF Meta Serif, FF Meta, Adobe Caslon, Filosofia, Meno, Baskerville, Interstate, News Gothic, Nobel, Degular, Clarendon, Ambroise, Proxima Nova, Rockwell, Trade Gothic, Bookmania, Museo Slab</textarea>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-top: 8px;">
+                    <strong>DES Department Approved Fonts.</strong> Only these fonts will be allowed in text layers. Clear this field to allow any font.
+                </p>
+            </div>
+            <div class="criteria-item" style="grid-column: 1 / -1;">
+                <label>Required Fonts (comma-separated)</label>
+                <input type="text" id="requiredFonts" placeholder="e.g., Helvetica, Arial">
+                <p>At least one text layer must use these fonts</p>
+            </div>
+            <div class="criteria-item">
+                <label>Points for Font Compliance</label>
+                <input type="number" id="fontPoints" value="20" min="0" max="50">
+                <div class="slider-container">
+                    <input type="range" class="value-slider" id="fontPointsSlider" value="20" min="0" max="50">
+                    <span class="slider-label-pill" id="fontPointsLabel">20</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+
+            <!-- Step 3: FERPA Anonymization (Optional) -->
+            <div class="step step-optional">
+                <h2>
+                    <span class="step-number optional">3</span>
+                    <span>FERPA Anonymization</span>
+                    <span class="optional-badge">Optional</span>
+                </h2>
+                <div class="step-description">
+                    <p>Anonymize student files for privacy compliance if this tool is run on a remote server not suitable to store Level 1 data. Not necessary if tool is run locally.</p>
+                </div>
+                
+                <div class="ferpa-section collapsed" id="ferpaSection">
+    <h4 class="collapsible-header">
+        <input type="checkbox" id="enableFerpaSection">
+        📋 Enable Anonymization
+    </h4>
+    <div class="collapsible-content">
+        <div class="criteria-item" style="margin-bottom: 0; background: white;">
+            <label>Anonymization Method</label>
+            <select id="anonMethod">
+                <option value="canvas">Use Canvas Submission IDs (if available)</option>
+                <option value="sequential">Sequential numbering (001, 002, ...)</option>
+                <option value="random">Random IDs</option>
+            </select>
+            <p style="margin-top: 10px;">
+                <strong>Canvas files:</strong> Will use submission IDs for consistent anonymization<br>
+                <strong>Other files:</strong> Will use selected fallback method
+            </p>
+        </div>
+    </div>
+</div>
+            </div>
+
+            <!-- Step 4: Canvas Integration (Optional) -->
+ <div class="step step-optional">
+    <h2>
+        <span class="step-number optional">4</span>
+        <span>Canvas LMS Integration</span>
+        <span class="optional-badge">Optional</span>
+    </h2>
+    <div class="step-description">
+        <p>Configure Canvas settings for seamless gradebook import</p>
+    </div>
+    
+    <div class="canvas-section collapsed" id="canvasSection">
+        <h4 class="collapsible-header">
+            <input type="checkbox" id="enableCanvasSection">
+            📚 Enable Canvas Integration
+        </h4>
+        <div class="collapsible-content">
+            <!-- Canvas Import Instructions - Now Green -->
+            <div class="instructions-box">
+                <div style="color: #065f46; font-weight: 500; margin-bottom: 6px;">🎯 Auto-Matching with Canvas</div>
+                <div style="font-size: 0.85rem; line-height: 1.4;">
+                    <strong>If you uploaded a Canvas ZIP:</strong> User IDs are automatically extracted!<br>
+                    • The export will include Canvas User IDs for perfect matching<br>
+                    • Late submissions are automatically flagged<br>
+                    • Student names are preserved from Canvas<br><br>
+                    <strong>To import grades:</strong><br>
+                    1. Download the Canvas CSV after grading<br>
+                    2. In Canvas: <strong>Grades → Actions → Import</strong><br>
+                    3. Upload the CSV - Canvas will auto-match by User ID!
+                </div>
+            </div>
+            
+            <div class="criteria-grid">
+                <div class="criteria-item">
+                    <label>Assignment Name</label>
+                    <input type="text" id="canvasAssignmentName" placeholder="e.g., Digital Poster Design - Assignment 1">
+                    <p>The exact assignment name as it appears in Canvas</p>
+                </div>
+                <div class="criteria-item">
+                    <label>Apply Late Penalty (%)</label>
+                    <input type="number" id="canvasLatePenalty" placeholder="e.g., 10" min="0" max="100" value="0">
+                    <p>Automatic deduction for late submissions (0 = no penalty)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- Process Button -->
+            <div class="process-section">
+                <button class="btn btn-primary btn-large" id="processFiles">
+                    🚀 Generate Grade Report
+                </button>
+            </div>
+
+            <!-- Step 5: Results -->
+            <div class="step" id="resultsSection" style="display: none;">
+                <h2><span class="step-number">5</span>Grading Results</h2>
+                <div id="summaryStats" class="summary-stats"></div>
+                <div id="processingIndicator" class="processing-indicator" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Processing files...</p>
+                </div>
+                <div id="results"></div>
+                
+                <!-- Canvas Import Instructions (shown when Canvas is enabled) -->
+                <div id="canvasInstructions" style="display: none;">
+                    <div class="instructions-box" style="margin-top: 20px;">
+                        <div style="font-weight: 600; margin-bottom: 12px; font-size: 1.1rem;">
+                            📚 Canvas Import Instructions
+                        </div>
+                        <div style="font-size: 0.95rem; line-height: 1.5;">
+                            <div style="margin-bottom: 8px;"><strong>Step 1:</strong> Download your Canvas CSV using the button above</div>
+                            <div style="margin-bottom: 8px;"><strong>Step 2:</strong> In Canvas, go to: <code style="background: #d1fae5; padding: 2px 6px; border-radius: 3px;">Gradebook → Actions → Import</code></div>
+                            <div style="margin-bottom: 8px;"><strong>Step 3:</strong> Upload the CSV file</div>
+                            <div><strong>Step 4:</strong> Canvas will auto-match the assignment by name - no manual mapping needed!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- JavaScript -->
+    <script src="js/psd_analyzer.js?v=9"></script>
+    <script src="js/main.js?v=9"></script>
+</body>
+</html>
