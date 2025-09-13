@@ -21,7 +21,7 @@ Automated grading tool for Adobe Photoshop assignments. Designed for educators t
 
 ## Canvas Integration
 
-- Upload Canvas ZIP directly—no renaming needed.
+- Upload Canvas ZIP directly, no renaming needed.
 - Canvas user IDs and late submissions are detected automatically.
 - Exported CSV matches Canvas gradebook format for seamless import.
 
